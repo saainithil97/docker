@@ -1,8 +1,8 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [What are containers?](#what-are-containers)
-- [Why do we need containers?](#why-do-we-need-containers)
+  - [What are containers?](#what-are-containers)
+  - [Why do we need containers?](#why-do-we-need-containers)
 - [Docker Overview](#docker-overview)
 - [Docker Architecture](#docker-architecture)
 - [Working with Docker](#working-with-docker)
@@ -11,6 +11,8 @@
     - [ENTRYPOINT vs CMD](#entrypoint-vs-cmd)
   - [Understanding Networks](#understanding-networks)
   - [Persisting data](#persisting-data)
+    - [Bind mount](#bind-mount)
+    - [Volume mount](#volume-mount)
 - [Some useful reads](#some-useful-reads)
   - [Docker container escapes](#docker-container-escapes)
   - [Tutorials](#tutorials)
@@ -214,11 +216,11 @@ https://design.jboss.org/redhatdeveloper/marketing/docker_cheatsheet/cheatsheet/
 
 Docker provides three types of networks.
 
-- Bridge
-- None
-- Host
-- overlay
-- macvlan
+- Bridge : Docker maintains its own network with an internal DNS.
+- None : Network is isolated and will not be visible to the host.
+- Host : Network is mapped to the host network.
+- overlay : Communication over several docker hosts.
+- macvlan : Assigns a MAC address to the containers and they behave like physical devices.
 
 ```bash
 docker network list
@@ -238,10 +240,38 @@ docker build -t flask-hello ./flask/app/
 docker run -i -p 5000:5000 flask-hello
 ```
 
+```
+docker build -t flask-hello ./flask/app/
+docker run -i --network=host -p 5000:5000 flask-hello
+```
+
 ## Persisting data
 
-Bind
-Volume
+Whatever data we have inside the container, will be lost once the container exists.
+There are two ways to persist data.
+
+- Bind mount and
+- Volume mount
+
+![alt mounting](types-of-mounts-volume.png)
+
+### Bind mount
+
+Bind mount mounts a file on the host system to the container.
+
+```
+docker run -i --volume ./data:/var/lib/postgresql/data postgres
+```
+
+### Volume mount
+
+Volumes are managed by docker.
+
+```
+docker volume create pg_data
+docker run -i --volume pg_data:/var/lib/postgresql/data postgres
+# docker run -i --mount  source=pg_data,target=/var/lib/postgresql/data postgres
+```
 
 # Some useful reads
 
